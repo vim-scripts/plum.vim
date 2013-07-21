@@ -1,385 +1,263 @@
-" 
+" ============================================================================
 " File: plum.vim
-" Description: Dark colorscheme
+" Description: Plum, a vim colorscheme for any occasion. 
 " Mantainer: Giacomo Comitti - https://github.com/gcmt
-" Url: https://github.com/gcmt/vim-plum-colorscheme
+" Url: https://github.com/gcmt/plum.vim
 " License: MIT
-" Version: 0.1
-" Last Changed: 15 Jul /2013
-"
-" 
-
-" Colors
-
-let s:foreground = "6d6d97"
-let s:background = "000116"
-
-let s:darkerfg = "44486a"
-let s:lighterbg = "15161f"
-let s:verylighterbg = "26283a"
-
-let s:purple = "8957aa"
-let s:darkpurple = "4b2b5c"
-let s:blue = "345399"
-let s:greishblue = "3a3c68"
-let s:aqua = "2f6f7a"
-let s:red = "8e3737"
-let s:lightred = "ff6155"
-let s:orange = "965E61"
-let s:grey = "707070"
-let s:pink = "902e67"
-let s:darkpink = "570e39"
-let s:green = "1d704a"
-let s:lightblue = "b5d5ff"
-let s:lightgrey = "cccccc"
+" Version: 0.2
+" Last Changed: 21 Jul 2013
+" ============================================================================
 
 
-set background=dark
+" Init colors
+
+" dark background colors
+let s:dark_fg              = ["6d6d97", 247]
+let s:dark_bg              = ["000116", 233]
+let s:dark_darkerfg        = ["44486a", 239]
+let s:dark_lighterbg1      = ["15161f", 234]
+let s:dark_lighterbg2      = ["26283a", 235]
+let s:dark_pink            = ["8957aa", 170]
+let s:dark_plum            = ["4b2b5c", 53]
+let s:dark_blue            = ["345399", 25]
+let s:dark_paleblue        = ["3a3c68", 236]
+let s:dark_aqua            = ["2f6f7a", 29]
+let s:dark_red             = ["b23e66", 160]
+let s:dark_lightred        = ["ff6155", 204]
+let s:dark_orange          = ["936365", 173]
+let s:dark_grey            = ["606060", 239]
+let s:dark_cerise          = ["902e67", 198]
+let s:dark_lightblue       = ["b5d5ff", 69]
+let s:dark_lightgrey       = ["cccccc", 242]
+
+" light background colors
+let s:light_fg             = ["4f4f4f", 238]
+let s:light_bg             = ["f9f9f9", 255]
+let s:light_blue           = ["4271ae", 25]
+let s:light_lightblue      = ["b5d5ff", 153]
+let s:light_aqua           = ["3e999f", 31]
+let s:light_grey           = ['808080', 243]
+let s:light_lightgrey      = ["cccccc", 251]
+let s:light_verylightgrey  = ["efefef", 254]
+let s:light_red            = ["d70000", 160]
+let s:light_lightred       = ["f05145", 203]
+let s:light_orange         = ["f5871f", 208]
+let s:light_yellow         = ["ffff55", 227]
+let s:light_gold           = ["e2b100", 178]
+let s:light_purple         = ["8959a8", 97]
+let s:light_green          = ["718c00", 64]  
+
+
+" Init settings
+
+let plum_cursorline_highlight_only_linenr = 
+    \ get(g:, "plum_cursorline_highlight_only_linenr", 0) 
+
+
+" Init
+
+let s:curr_bg = &bg
+
 hi clear
-syntax reset
+if exists("syntax_on")
+    syntax reset
+endif
 
 let g:colors_name = "plum"
 
 
+" Set colors
+
 if has("gui_running") || &t_Co == 88 || &t_Co == 256
 
-    " Color conversion functions {{{
 
-	" Returns an approximate grey index for the given grey level
-	fun <SID>grey_number(x)  " {{{
-		if &t_Co == 88
-			if a:x < 23
-				return 0
-			elseif a:x < 69
-				return 1
-			elseif a:x < 103
-				return 2
-			elseif a:x < 127
-				return 3
-			elseif a:x < 150
-				return 4
-			elseif a:x < 173
-				return 5
-			elseif a:x < 196
-				return 6
-			elseif a:x < 219
-				return 7
-			elseif a:x < 243
-				return 8
-			else
-				return 9
-			endif
-		else
-			if a:x < 14
-				return 0
-			else
-				let l:n = (a:x - 8) / 10
-				let l:m = (a:x - 8) % 10
-				if l:m < 5
-					return l:n
-				else
-					return l:n + 1
-				endif
-			endif
-		endif
-	endfun  " }}}
+    fun! <SID>H(group, fg, bg, attr)  " {{{
+        if s:curr_bg == "dark"
+            if !empty(a:fg)
+                exec "hi " . a:group . " guifg=#" . a:fg[0][0] . " ctermfg=" . a:fg[0][1]
+            endif
+            if !empty(a:bg)
+                exec "hi " . a:group . " guibg=#" . a:bg[0][0] . " ctermbg=" . a:bg[0][1]
+            endif
+        else
+            if !empty(a:fg)
+                exec "hi " . a:group . " guifg=#" . a:fg[1][0] . " ctermfg=" . a:fg[1][1]
+            endif
+            if !empty(a:bg)
+                exec "hi " . a:group . " guibg=#" . a:bg[1][0] . " ctermbg=" . a:bg[1][1]
+            endif
+        endif
+        if a:attr != ""
+            exec "hi " . a:group . " gui=" . a:attr . " cterm=" . a:attr
+        endif
+    endfun  " }}}
 
-	" Returns the actual grey level represented by the grey index
-	fun <SID>grey_level(n)  " {{{
-		if &t_Co == 88
-			if a:n == 0
-				return 0
-			elseif a:n == 1
-				return 46
-			elseif a:n == 2
-				return 92
-			elseif a:n == 3
-				return 115
-			elseif a:n == 4
-				return 139
-			elseif a:n == 5
-				return 162
-			elseif a:n == 6
-				return 185
-			elseif a:n == 7
-				return 208
-			elseif a:n == 8
-				return 231
-			else
-				return 255
-			endif
-		else
-			if a:n == 0
-				return 0
-			else
-				return 8 + (a:n * 10)
-			endif
-		endif
-	endfun  " }}}
 
-	" Returns the palette index for the given grey index
-	fun <SID>grey_colour(n)  " {{{
-		if &t_Co == 88
-			if a:n == 0
-				return 16
-			elseif a:n == 9
-				return 79
-			else
-				return 79 + a:n
-			endif
-		else
-			if a:n == 0
-				return 16
-			elseif a:n == 25
-				return 231
-			else
-				return 231 + a:n
-			endif
-		endif
-	endfun  " }}}
+    " Vim Highlighting
 
-	" Returns an approximate colour index for the given colour level
-	fun <SID>rgb_number(x)  " {{{
-		if &t_Co == 88
-			if a:x < 69
-				return 0
-			elseif a:x < 172
-				return 1
-			elseif a:x < 230
-				return 2
-			else
-				return 3
-			endif
-		else
-			if a:x < 75
-				return 0
-			else
-				let l:n = (a:x - 55) / 40
-				let l:m = (a:x - 55) % 40
-				if l:m < 20
-					return l:n
-				else
-					return l:n + 1
-				endif
-			endif
-		endif
-	endfun  " }}}
+    " e.g call <SID>H('Colorgroup', [dark fg, light fg], [dark bg, light bg], 'style')
 
-	" Returns the actual colour level for the given colour index
-	fun <SID>rgb_level(n)  " {{{
-		if &t_Co == 88
-			if a:n == 0
-				return 0
-			elseif a:n == 1
-				return 139
-			elseif a:n == 2
-				return 205
-			else
-				return 255
-			endif
-		else
-			if a:n == 0
-				return 0
-			else
-				return 55 + (a:n * 40)
-			endif
-		endif
-	endfun  " }}}
+    call <SID>H( "Normal", [s:dark_fg, s:light_fg], [s:dark_bg, s:light_bg], "")  " normal text
 
-	" Returns the palette index for the given R/G/B colour indices
-	fun <SID>rgb_colour(x, y, z)  " {{{
-		if &t_Co == 88
-			return 16 + (a:x * 16) + (a:y * 4) + a:z
-		else
-			return 16 + (a:x * 36) + (a:y * 6) + a:z
-		endif
-	endfun  " }}}
+    call <SID>H( "Cursor", [], [s:dark_aqua, s:light_lightred], "")  " the character under the cursor
 
-	" Returns the palette index to approximate the given R/G/B colour levels
-	fun <SID>colour(r, g, b)  " {{{
-		" Get the closest grey
-		let l:gx = <SID>grey_number(a:r)
-		let l:gy = <SID>grey_number(a:g)
-		let l:gz = <SID>grey_number(a:b)
+    call <SID>H( "NonText", [s:dark_blue, s:light_blue], [], "")  " '~' and '@' at the end of the window, characters from 'showbreak' and other characters that do not really exist in the text (e.g., '>' displayed when a double-wide character doesn't fit at the end of the line).
+    call <SID>H( "SpecialKey", [s:dark_lighterbg2, s:light_lightgrey], [s:dark_bg, s:light_bg], "none")  " Meta and special keys listed with ':map', also for text used to show unprintable characters in the text, 'listchars'. Generally: text that is displayed differently from what it really is.
 
-		" Get the closest colour
-		let l:x = <SID>rgb_number(a:r)
-		let l:y = <SID>rgb_number(a:g)
-		let l:z = <SID>rgb_number(a:b)
+    call <SID>H( "Search", [],  [s:dark_cerise, s:light_yellow], "")  " Last search pattern highlighting (see 'hlsearch'). Also used for highlighting the current line in the quickfix window and similar items that need to stand out.
+    call <SID>H( "IncSearch", [s:dark_cerise, s:light_yellow], [s:dark_fg, s:light_fg], "")  " 'incsearch' highlighting; also used for the text replaced with ':s///c'
 
-		if l:gx == l:gy && l:gy == l:gz
-			" There are two possibilities
-			let l:dgr = <SID>grey_level(l:gx) - a:r
-			let l:dgg = <SID>grey_level(l:gy) - a:g
-			let l:dgb = <SID>grey_level(l:gz) - a:b
-			let l:dgrey = (l:dgr * l:dgr) + (l:dgg * l:dgg) + (l:dgb * l:dgb)
-			let l:dr = <SID>rgb_level(l:gx) - a:r
-			let l:dg = <SID>rgb_level(l:gy) - a:g
-			let l:db = <SID>rgb_level(l:gz) - a:b
-			let l:drgb = (l:dr * l:dr) + (l:dg * l:dg) + (l:db * l:db)
-			if l:dgrey < l:drgb
-				" Use the grey
-				return <SID>grey_colour(l:gx)
-			else
-				" Use the colour
-				return <SID>rgb_colour(l:x, l:y, l:z)
-			endif
-		else
-			" Only one possibility
-			return <SID>rgb_colour(l:x, l:y, l:z)
-		endif
-	endfun  " }}}
+    call <SID>H( "StatusLine", [s:dark_blue, s:light_blue], [s:dark_lighterbg1, s:light_verylightgrey], "none" )  " status line of current window
+    call <SID>H( "StatusLineNC", [s:dark_lighterbg1, s:light_verylightgrey], [s:dark_paleblue, s:light_lightgrey], "inverse" )  " status lines of not-current windows
+    call <SID>H( "StatusLineErr", [s:dark_cerise, s:light_lightred], [s:dark_lighterbg1, s:light_verylightgrey], "" )  " custom
+    call <SID>H( "StatusLineBold", [s:dark_blue, s:light_blue], [s:dark_lighterbg1, s:light_verylightgrey], "bold" )  " custom
 
-	" Returns the palette index to approximate the 'rrggbb' hex string
-	fun <SID>rgb(rgb)  " {{{
-		let l:r = ("0x" . strpart(a:rgb, 0, 2)) + 0
-		let l:g = ("0x" . strpart(a:rgb, 2, 2)) + 0
-		let l:b = ("0x" . strpart(a:rgb, 4, 2)) + 0
+    call <SID>H( "VertSplit", [s:dark_bg, s:light_bg],  [s:dark_lighterbg2, s:light_blue], "inverse" )  " the column separating vertically split windows
 
-		return <SID>colour(l:r, l:g, l:b)
-	endfun  " }}}
+    call <SID>H( "Visual", [], [s:dark_lighterbg2, s:light_lightblue], "")  " visual mode selection
+    call <SID>H( "MatchParen", [], [s:dark_lighterbg2, s:light_lightblue], "" )  " The character under the cursor or just before it, if it is a paired bracket, and its match.
 
-	" Sets the highlighting for the given group
-	fun <SID>X(group, fg, bg, attr)  " {{{
-		if a:fg != ""
-			exec "hi " . a:group . " guifg=#" . a:fg . " ctermfg=" . <SID>rgb(a:fg)
-		endif
-		if a:bg != ""
-			exec "hi " . a:group . " guibg=#" . a:bg . " ctermbg=" . <SID>rgb(a:bg)
-		endif
-		if a:attr != ""
-			exec "hi " . a:group . " gui=" . a:attr . " cterm=" . a:attr
-		endif
-	endfun  " }}}
+    call <SID>H( "Directory", [s:dark_paleblue, s:light_purple], [], "" )  " directory names (and other special names in listings
 
-    " }}}
+    call <SID>H( "Folded", [s:dark_darkerfg, s:light_grey], [s:dark_bg, s:light_bg], "" )  " line used for closed folds
+    call <SID>H( "FoldColumn", [s:dark_grey, s:light_gold], [s:dark_bg, s:light_bg], "")  " see 'foldcolumn'
 
-	" Vim Highlighting
-	call <SID>X("Normal", s:foreground, s:background, "")
-    highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=#2c2d4f guibg=NONE
-	call <SID>X("NonText", s:blue, "", "")
-	call <SID>X("SpecialKey", s:verylighterbg, "", "")
-	call <SID>X("Search", "", s:lightred, "")
-	call <SID>X("IncSearch", s:lightred, s:foreground, "")
-	call <SID>X("StatusLine", s:pink, s:lighterbg, "none")
-	call <SID>X("StatusLineNC", s:lighterbg, s:greishblue, "")
-    call <SID>X("StlErr", s:blue, s:lighterbg, "")
-	call <SID>X("StlFname", s:pink, s:lighterbg, "bold")
-	call <SID>X("VertSplit", s:verylighterbg, s:background, "none")
-	call <SID>X("Visual", "", s:verylighterbg, "")
-	call <SID>X("MatchParen", "", s:verylighterbg, "")
-	call <SID>X("Directory", s:greishblue, "", "")
-	call <SID>X("Folded", s:darkerfg, s:background, "")
-	call <SID>X("FoldColumn", "", s:background, "")
-	call <SID>X("ModeMsg", s:pink, "", "")
-	call <SID>X("MoreMsg", s:pink, "", "")
-	call <SID>X("Question", s:aqua, "", "")
-	call <SID>X("Cursor", s:background, s:aqua, "")
-	call <SID>X("WarningMsg", s:pink, s:background, "")
-	call <SID>X("ErrorMsg", s:pink, s:background, "")
-	call <SID>X("WildMenu", s:purple, s:verylighterbg, "")
-	call <SID>X("SignColumn", "", s:background, "")
-	call <SID>X("SignErr", s:red, s:background, "")
-	call <SID>X("SignWrn", s:orange, s:background, "")
-	if version >= 700
-		call <SID>X("CursorLine", "", s:lighterbg, "none")
-		call <SID>X("CursorColumn", "", s:lighterbg, "none")
-		call <SID>X("PMenu", s:blue, s:lightblue, "none")
-		call <SID>X("PMenuSel", s:lightblue, s:blue, "none")
-		call <SID>X("PMenuSBar", s:grey, s:grey, "none")
-		call <SID>X("PMenuThumb", s:grey, s:lightgrey, "none")
-		call <SID>X("TabLine", s:foreground, s:verylighterbg, "none")
-		call <SID>X("TabLineSel", s:background, s:lightblue, "none")
-		call <SID>X("TabLineFill", s:lightgrey, s:verylighterbg,"none")
+    call <SID>H( "WarningMsg", [s:dark_cerise, s:light_lightred], [s:dark_bg, s:light_bg], "" ) " warning messages
+    call <SID>H( "ErrorMsg", [s:dark_cerise, s:light_lightred], [s:dark_bg, s:light_bg], "" )  " error messages on the command line
+    call <SID>H( "ModeMsg", [s:dark_aqua, s:light_green], [], "")  " 'showmode' message (e.g., '-- INSERT --')
+    call <SID>H( "MoreMsg", [s:dark_aqua, s:light_green],  [], "")  " more-prompt
+    call <SID>H( "Question", [s:dark_aqua, s:light_green],  [], "")  " hit-enter prompt and yes/no questions
+
+    call <SID>H( "WildMenu", [s:dark_pink, s:light_blue], [s:dark_lighterbg2, s:light_lightblue], "" )  " current match in 'wildmenu' completion
+
+    call <SID>H( "SignColumn", [], [s:dark_bg, s:light_bg], "" )  " column where signs are displayed
+
+    call <SID>H( "Linenr", [s:dark_lighterbg2, s:light_lightgrey], [], "" )  " line number for ':number' and ':#' commands, and when 'number' or 'relativenumber' option is set.
+    
+
+    call <SID>H( "DiffAdd", [s:dark_bg, s:light_bg], [s:dark_aqua, s:light_green], "")  " diff mode: Added line
+    call <SID>H( "DiffDelete", [s:dark_bg, s:light_bg], [s:dark_red, s:light_lightred], "" )  " diff mode: Deleted line
+    call <SID>H( "DiffChange", [s:dark_bg, s:light_bg], [s:dark_paleblue, s:light_gold], "" )  " diff mode: Changed line
+    call <SID>H( "DiffText", [s:dark_bg, s:light_bg], [s:dark_red, s:light_lightred], "none" )  " diff mode: Changed text within a changed line
+
+    if version >= 700
+
+    call <SID>H( "CursorLineNr", [s:dark_darkerfg, s:light_grey], [], "" )  " like LineNr when 'cursorline' is set for the cursor line.
+    if g:plum_cursorline_highlight_only_linenr
+        call <SID>H( "CursorLine", [], [s:dark_bg, s:light_bg], "none" )  " the screen line that the cursor is in when 'cursorline' is set
+    else
+        call <SID>H( "CursorLine", [], [s:dark_lighterbg1, s:light_verylightgrey], "none" )  " the screen line that the cursor is in when 'cursorline' is set
+    endif
+        
+    call <SID>H( "CursorColumn", [], [s:dark_lighterbg1, s:light_verylightgrey], "" )  " the screen column that the cursor is in when 'cursorcolumn' is set
+
+    call <SID>H( "PMenu", [s:dark_blue, s:light_blue], [s:dark_lightblue, s:light_lightblue], "none" )  " popup menu: normal item
+    call <SID>H( "PMenuSel", [s:dark_lightblue, s:light_lightblue], [s:dark_blue, s:light_blue], "none" )  " popup menu: selected item
+    call <SID>H( "PMenuSBar", [s:dark_grey, s:light_grey], [s:dark_grey, s:light_grey], "none" )  " popup menu: scrollbar
+    call <SID>H( "PMenuThumb", [s:dark_grey, s:light_grey], [s:dark_lightgrey, s:light_lightgrey], "none" )  " popup menu: Thumb of the scrollbar
+
+    call <SID>H( "TabLine", [s:dark_fg, s:light_grey], [s:dark_lighterbg2, s:light_verylightgrey], "none" )  " tab pages line, not active tab page label
+    call <SID>H( "TabLineSel", [s:dark_bg, s:light_bg], [s:dark_lightblue, s:light_lightblue], "none" )  " tab pages line, active tab page label
+    call <SID>H( "TabLineFill", [s:dark_lightgrey, s:light_lightgrey], [s:dark_lighterbg2, s:light_verylightgrey], "none" )  " tab pages line, where there are no labels
+
+    endif
+
+    if version >= 703
+
+    call <SID>H( "ColorColumn", [], [s:dark_lighterbg1, s:light_verylightgrey], "" )  " used for the columns set with 'colorcolumn'
+
+    call <SID>H( "Conceal", [s:dark_lighterbg2, s:light_lightgrey], [s:dark_bg, s:light_bg], "" )  " placeholder characters substituted for concealed text (see 'conceallevel')
+
+    " TODO 
+    call <SID>H( "SpellBad", [], [], "undercurl" )  " word that is not recognized by the spellchecker. This will be combined with the highlighting used otherwise
+    call <SID>H( "SpellCap", [], [], "" )  " word that should start with a capital. This will be combined with the highlighting used otherwise
+    call <SID>H( "SpellLocal", [], [], "" )  " word that is recognized by the spellchecker as one that is used in another region. This will be combined with the highlighting used otherwise
+    call <SID>H( "SpellRare", [], [], "" )  " word that is recognized by the spellchecker as one that is hardly ever used. This will be combined with the highlighting used otherwise
+
     end
-	if version >= 703
-		call <SID>X("ColorColumn", "", s:lighterbg, "none")
-		call <SID>X("Conceal", s:verylighterbg, "", "")
-	end
 
-	" Standard Language Highlighting
-	call <SID>X("Comment", s:greishblue, "", "")
-	call <SID>X("Todo", s:blue, s:verylighterbg, "")
-	call <SID>X("Statement", s:blue, "", "none")
-	call <SID>X("Identifier", s:foreground, "", "none")
-	call <SID>X("Conditional", s:purple, "", "")
-	call <SID>X("Repeat", s:orange, "", "")
-	call <SID>X("Function", s:blue, "", "")
-	call <SID>X("Constant", s:grey, "", "")
-	call <SID>X("Number", s:grey, "", "")
-	call <SID>X("Boolean", s:grey, "", "")
-	call <SID>X("String", s:darkpurple, "", "")
-	call <SID>X("Character", s:darkpurple, "", "")
-	call <SID>X("Operator", s:aqua, "", "none")
-	call <SID>X("Type", s:aqua, "", "none")
-	call <SID>X("Exception", s:pink, "", "")
-	call <SID>X("Keyword", s:foreground, "", "")
-	call <SID>X("Title", s:foreground, "", "bold")
-	call <SID>X("Structure", s:foreground, "", "")
-	call <SID>X("Special", s:darkerfg, "", "")
-	call <SID>X("PreProc", s:foreground, "", "")
-	call <SID>X("Define", s:darkerfg, "", "none")
-	call <SID>X("Include", s:darkerfg, "", "")
+    " Standard Language Highlighting
+    call <SID>H( "Constant", [s:dark_grey, s:light_grey], [], "" )  " any constant
+    call <SID>H( "String", [s:dark_plum, s:light_green], [], "" )   " a string constant: 'this is a string'
+    call <SID>H( "Character", [s:dark_plum, s:light_green], [], "" )  " a character constant: 'c', '\n'
+    call <SID>H( "Number", [s:dark_grey, s:light_grey], [], "" )  " a number constant: 234, 0xff
+    call <SID>H( "Boolean", [s:dark_grey, s:light_grey], [], "" )  " a boolean constant: TRUE, false
+    call <SID>H( "Float", [s:dark_grey, s:light_grey], [], "" )  " a floating point constant: 2.3e10
+    call <SID>H( "Identifier", [s:dark_fg, s:light_fg], [], "none" )  " any variable name
+    call <SID>H( "Function", [s:dark_blue, s:light_blue], [], "" )  " function name (also: methods for classes)
+    call <SID>H( "Statement",  [s:dark_blue, s:light_blue], [], "none" )  " any statement
+    call <SID>H( "Conditional",[s:dark_pink, s:light_purple], [], "" )  " if, then, else, endif, switch, etc
+    call <SID>H( "Label", [s:dark_pink, s:light_purple], [], "" )  "  case, default, etc.
+    call <SID>H( "Repeat", [s:dark_orange, s:light_orange], [], "" )  " for, do, while, etc.
+    call <SID>H( "Comment", [s:dark_paleblue, s:light_lightgrey], [], "")  " any comment
+    call <SID>H( "Operator", [s:dark_fg, s:light_aqua], [], "none" )  " 'sizeof', '+', '*', etc.
+    call <SID>H( "Keyword", [s:dark_fg, s:light_fg], [], "" )  " any other keyword
+    call <SID>H( "Exception", [s:dark_cerise, s:light_lightred], [], "" )  " try, catch, throw
+    call <SID>H( "PreProc", [s:dark_darkerfg, s:light_purple], [], "" )  " generic Preprocessor
+    call <SID>H( "Include", [s:dark_darkerfg, s:light_grey], [], "" )  " preprocessor #include
+    call <SID>H( "Define", [s:dark_darkerfg, s:light_grey], [], "none" )  " preprocessor #define
+    call <SID>H( "PreCondit", [s:dark_darkerfg, s:light_grey], [], "")  " preprocessor #if, #else, #endif, etc
+    call <SID>H( "Type", [s:dark_aqua, s:light_aqua], [], "none" )  " int, long, char, etc.
+    call <SID>H( "StorageClass", [s:dark_aqua, s:light_aqua], [], "" )  " static, register, volatile, etc.
+    call <SID>H( "Structure", [s:dark_aqua, s:light_aqua], [], "" )  " struct, union, enum, etc.
+    call <SID>H( "Typedef", [s:dark_darkerfg, s:light_grey], [], "" )  " a typedef
+    call <SID>H( "Special", [s:dark_darkerfg, s:light_grey], [], "")  " any special symbol
+    call <SID>H( "Underlined", [s:dark_darkerfg, s:light_grey], [], "underline" )  " text that stands out, HTML links
+    call <SID>H( "Title", [s:dark_fg, s:light_fg], [],   "bold" )
+    call <SID>H( "Error", [], [s:dark_red, s:light_red], "none" )  " any erroneous construct
+    call <SID>H( "Todo", [s:dark_blue, s:light_grey], [s:dark_lighterbg2, s:light_verylightgrey], "")  " anything that needs extra attention; mostly the keywords TODO FIXME and XXX
 
-	" Python Highlighting
-    call <SID>X("pythonFunction", s:foreground, "", "")
-	call <SID>X("pythonPreCondit", s:darkerfg, "", "")
-	call <SID>X("pythonSelf", s:darkerfg, "", "")
-	call <SID>X("pythonDottedName", s:darkerfg, "", "")
+    " Python Highlighting
+    call <SID>H( "pythonFunction", [s:dark_fg, s:light_fg], [], "" )
+    call <SID>H( "pythonPreCondit",  [s:dark_paleblue, s:light_orange], [], "" )
+    call <SID>H( "pythonDottedName",  [s:dark_darkerfg, s:light_grey], [], "" )
 
-	" Go Highlighting
-	call <SID>X("goDirective", s:greishblue, "", "")
-	call <SID>X("goGoroutine", s:pink, "", "")
-	call <SID>X("goSpecial", s:greishblue, "", "")
-	call <SID>X("goFunction", s:foreground, "", "underline")
+    " Go Highlighting
+    call <SID>H( "goDirective", [s:dark_paleblue, s:light_orange], [], "" )
+    call <SID>H( "goGoroutine", [s:dark_cerise, s:light_lightred], [], "" )
+    call <SID>H( "goFunction", [s:dark_fg, s:light_fg], [], "" )
 
-	" Vim Highlighting
-	call <SID>X("vimCommand", s:blue, "", "none")
-	call <SID>X("vimFuncname", s:foreground, "", "none")
+    " Vim Highlighting
+    call <SID>H( "vimCommand", [s:dark_blue, s:light_blue], [], "none" )
+    call <SID>H( "vimFuncName", [s:dark_darkerfg, s:light_fg], [], "none" )
 
-	" Java Highlighting
-	call <SID>X("javaTypeDef", s:darkerfg, "", "")
-	call <SID>X("javaOperator", s:pink, "", "")
-	call <SID>X("javaClassDecl", s:blue, "", "")
-	call <SID>X("javaStorageClass", s:blue, "", "")
+    " Java Highlighting
+    call <SID>H( "javaTypeDef", [s:dark_darkerfg, s:light_grey], [], "" )
+    call <SID>H( "javaOperator", [s:dark_cerise, s:light_lightred], [], "" )
+    call <SID>H( "javaClassDecl", [s:dark_blue, s:light_blue], [], "" )
+    call <SID>H( "javaStorageClass",[s:dark_blue, s:light_blue], [], "" )
 
-	" JavaScript Highlighting
-	call <SID>X("javaScriptBraces", s:darkerfg, "", "")
-	call <SID>X("javaScriptIdentifier", s:darkerfg, "", "")
-	call <SID>X("javaScriptLabel", s:purple, "", "")
-	call <SID>X("javaScriptMember", s:darkerfg, "", "")
-	call <SID>X("javaScriptGlobal", s:darkerfg, "", "")
-	call <SID>X("javaScriptReserver", s:blue, "", "")
-	call <SID>X("javaScriptNull", s:grey, "", "")
-	call <SID>X("javaScriptType", s:foreground, "", "")
-	call <SID>X("javaScriptNumber", s:grey, "", "")
+    " JavaScript Highlighting
+    call <SID>H( "javaScriptBraces", [s:dark_darkerfg, s:light_grey], [], "" )
+    call <SID>H( "javaScriptIdentifier", [s:dark_darkerfg, s:light_fg], [], "" )
+    call <SID>H( "javaScriptLabel", [s:dark_pink, s:light_purple], [], "" )
+    call <SID>H( "javaScriptMember", [s:dark_darkerfg, s:light_grey], [], "" )
+    call <SID>H( "javaScriptGlobal", [s:dark_darkerfg, s:light_grey], [], "" )
+    call <SID>H( "javaScriptReserver", [s:dark_blue, s:light_blue], [], "" )
+    call <SID>H( "javaScriptNull", [s:dark_grey, s:light_grey], [], "" )
+    call <SID>H( "javaScriptType", [s:dark_fg, s:light_aqua], [], "" )
+    call <SID>H( "javaScriptNumber", [s:dark_grey, s:light_grey], [], "" )
 
-	" HTML Highlighting
-	call <SID>X("htmlTag", s:greishblue, "", "")
-	call <SID>X("htmlEndTag", s:greishblue, "", "")
-	call <SID>X("htmlTagName", s:blue, "", "")
-	call <SID>X("htmlArg", s:greishblue, "", "")
-	call <SID>X("htmlScriptTag", s:blue, "", "")
+    " HTML Highlighting
+    call <SID>H( "htmlTag", [s:dark_paleblue, s:light_grey], [], "" )
+    call <SID>H( "htmlEndTag", [s:dark_paleblue, s:light_grey], [], "" )
+    call <SID>H( "htmlTagName", [s:dark_blue, s:light_blue], [], "" )
+    call <SID>H( "htmlArg", [s:dark_paleblue, s:light_aqua],[], "" )
+    call <SID>H( "htmlScriptTag", [s:dark_paleblue, s:light_grey], [], "" )
 
     " Markdown Highlighting
-	call <SID>X("markdownListMarker", s:aqua, "", "")
-	call <SID>X("markdownCode", s:greishblue, "", "")
-	call <SID>X("markdownBold", s:darkerfg, "", "bold")
-	call <SID>X("markdownBlockquote", s:darkerfg, "", "")
+    call <SID>H( "markdownListMarker", [s:dark_aqua, s:light_aqua], [], "" )
+    call <SID>H( "markdownCode", [s:dark_paleblue, s:light_lightgrey], [], "" )
+    call <SID>H( "markdownBold", [s:dark_darkerfg, s:light_grey], [], "bold" )
+    call <SID>H( "markdownBlockquote", [s:dark_darkerfg, s:light_grey], [], "" )
 
-	" Diff Highlighting
-	call <SID>X("diffAdded", s:green, "", "")
-	call <SID>X("diffRemoved", s:red, "", "")
+    " Diff Highlighting
 
-	" Delete Functions {{{
-	delf <SID>X
-	delf <SID>rgb
-	delf <SID>colour
-	delf <SID>rgb_colour
-	delf <SID>rgb_level
-	delf <SID>rgb_number
-	delf <SID>grey_colour
-	delf <SID>grey_level
-	delf <SID>grey_number
-    " }}}
+    delf <SID>H
 endif
+
+
+" FIXME Restore the background (needed for terminal vim):
+" &bg is turned to `light` for no reason after setting the colorscheme.
+" Am I missing something?
+exec "set bg=" . s:curr_bg  
