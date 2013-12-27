@@ -1,8 +1,8 @@
 ## Plum colorscheme
 
 Plum is a vim colorscheme that support both light and dark background.
-If you are a Mac OS X, Plum provides some functionalities that in conjunction
-with autocommands allow to automatically switch between *dark* and *light* background
+If you are a Mac OS X, Plum provides some functionalities that
+allow you to automatically switch between *dark* and *light* background
 as the ambient light changes.
 
 
@@ -14,9 +14,9 @@ or [Neobundle](https://github.com/Shougo/neobundle.vim).
 
 2. If you're running Mac OS X and want to use ambient light detection you need to move to the
 plugin root directory and run
-    ```
-    $ ./install.sh
-    ```
+```
+$ ./install.sh
+```
 
 ### Usage
 
@@ -31,24 +31,26 @@ To easily switch between dark and light background you might find useful the fol
 nnoremap <silent> <F7> :exe 'set bg=' . (&bg == 'dark' ? 'light' : 'dark')<CR>
 ```
 
-If you are running Mac OS X you can take advantage of the camera in front of you for detecting
-the ambient light and change the colorscheme background accordingly.
-Plum defines for you the function `plum#SetBgAccordingToAmbientLight()` so that you can use it
-whenever you what to set the background (_dark_ or _light_) according to the current ambient light.
-Normally you want to use it in conjunction with autocommands, e.g.:
-```                                    vim
-au VimEnter,FocusLost * call plum#SetBgAccordingToAmbientLight()
+If you are running Mac OS X  and a camera is available, Plum can detect the
+current ambient light and change the colorscheme background accordingly. By
+default Plum set the right background only when Vim starts, but with the
+function `PlumSetBackground()` you can change the background in other
+occasions, normally with autocommand events:
+```vim
+au FocusLost,CursorHold * call PlumSetBackgroud()
 ```
 
 
 ### Settings
 
-Set in your `.vimrc` the options you find useful:
-
 ```vim
-let g:plum_cursorline_highlight_only_linenr = 0
-" Set this option to 1 (default is 0) to highlight only the current the line number
-" when 'cursorline' is on.
+let g:plum_cursorline_style = 1
+" With this option you can set different styles for highlighting the current line
+" when the 'cursorline' option is turned on:
+"
+"   - 1: Highlight both the current line and the current line number. (default)
+"   - 2: Highlight only the current line.
+"   - 3: Highlight only the current line number.
 
 let g:plum_threshold = 120000
 " When the ambient light sensor read a value below this value, the background is
@@ -57,13 +59,12 @@ let g:plum_threshold = 120000
 " sensor span the range [0 - 67,092,408] but I've found that indoor the range
 " is roughly [0 - 2,000,000]. To me, only below 120,000 (default) it seems
 " reasonable to set a dark background but I also know this is just my preference.
-" To find the value right for you check out the next option.
+" If the default value does not fit for you, to find the right one you can experiment
+" directly with the 'light' executable in the 'bin' directory.
 
-let g:plum_debug = 0
-" Set this option to 1 to output the ambient light read by the sensor whenever the
-" plum#SetBgAccordingToAmbientLight() is called. You might find this useful when
-" the default threshold value does not suit your tastes and you want to find the
-" right one for you.
+let g:plum_force_bg = ""
+" Set this option to `light` or `dark` to force a specific background
+" regardless of the current ambient light.
 ```
 
 

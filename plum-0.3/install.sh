@@ -6,4 +6,3 @@ cd ./src
 make -s
 mkdir ../bin
 mv plum_ambient_light ../bin
-echo "..installation complete."
